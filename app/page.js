@@ -5,10 +5,12 @@ export default function Home() {
   const [todos, setTodos] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(true)
+  const [serverTime, setServerTime] = useState('')
 
   // 从后端 API 获取待办列表
   useEffect(() => {
     fetchTodos()
+    fetchHealth()
   }, [])
 
   async function fetchTodos() {
@@ -16,6 +18,12 @@ export default function Home() {
     const data = await res.json()
     setTodos(data)
     setLoading(false)
+  }
+
+  async function fetchHealth() {
+    const res = await fetch('/api/health')
+    const data = await res.json()
+    setServerTime(data.time)
   }
 
   // 添加待办
@@ -49,8 +57,14 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>📝 待办事项</h1>
-      <p style={styles.subtitle}>Next.js 全栈 Demo（带后端 API）</p>
+      <h1 style={styles.title}>🚀 待办事项 v2.0</h1>
+      <p style={styles.subtitle}>Next.js 全栈 Demo — 自动部署测试</p>
+      
+      {serverTime && (
+        <div style={styles.badge}>
+          🟢 服务器在线 · {new Date(serverTime).toLocaleString('zh-CN')}
+        </div>
+      )}
 
       <form onSubmit={addTodo} style={styles.form}>
         <input
@@ -85,6 +99,7 @@ export default function Home() {
       <p style={styles.footer}>
         共 {todos.length} 项 · 已完成 {todos.filter(t => t.done).length} 项
       </p>
+      <p style={styles.version}>v2.0 · Powered by Next.js + Vercel 🎉</p>
     </div>
   )
 }
@@ -99,7 +114,11 @@ const styles = {
     boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
   },
   title: { fontSize: '28px', marginBottom: '4px' },
-  subtitle: { color: '#888', fontSize: '14px', marginBottom: '24px' },
+  subtitle: { color: '#888', fontSize: '14px', marginBottom: '16px' },
+  badge: {
+    background: '#f0fff4', border: '1px solid #c6f6d5', borderRadius: '8px',
+    padding: '8px 12px', fontSize: '13px', color: '#276749', marginBottom: '20px',
+  },
   form: { display: 'flex', gap: '8px', marginBottom: '24px' },
   input: {
     flex: 1, padding: '12px 16px', border: '2px solid #eee',
@@ -118,4 +137,5 @@ const styles = {
   deleteBtn: { background: 'none', border: 'none', fontSize: '18px', cursor: 'pointer' },
   empty: { color: '#aaa', textAlign: 'center', padding: '20px' },
   footer: { color: '#888', fontSize: '13px', textAlign: 'center', marginTop: '16px' },
+  version: { color: '#aaa', fontSize: '12px', textAlign: 'center', marginTop: '8px' },
 }
